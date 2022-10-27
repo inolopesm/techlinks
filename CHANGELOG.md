@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/inolopesm/tech-links/compare/v1.1.0...v1.2.0) (2022-10-27)
+
+
+### Features
+
+* add bootstrap css ([e060874](https://github.com/inolopesm/tech-links/commit/e0608743185f82e11a957fb69dbacc46de7bd88f))
+* create api route called createLink ([bef2545](https://github.com/inolopesm/tech-links/commit/bef25457ff520f2c4a0432bb03e96c3995316377))
+* create formatList function ([bb4f621](https://github.com/inolopesm/tech-links/commit/bb4f62149fcdd795e97aca79a2181e5cb3dd55bf))
+* create Link and Tag models ([08ab333](https://github.com/inolopesm/tech-links/commit/08ab333db0b14c45fee4d63517accf5f2de26016))
+* create prisma service ([571b188](https://github.com/inolopesm/tech-links/commit/571b18879859673b4d40bdbb8cbc08c929f5bd89))
+* create Unpacked typescript utility ([d50629f](https://github.com/inolopesm/tech-links/commit/d50629fb7a5c26e433a192e57550344dd7d74d46))
+* make create link form works and get links from database ([bc47e26](https://github.com/inolopesm/tech-links/commit/bc47e261345719a10f26a2e58a8159e2c5cba467))
+
 ## [1.1.0](https://github.com/inolopesm/tech-links/compare/v1.0.0...v1.1.0) (2022-10-27)
 
 
