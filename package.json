@@ -13,7 +13,8 @@
     "@commitlint/config-conventional": "^17.1.0",
     "next": "13.0.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "release": "standard-version"
   },
   "devDependencies": {
     "@types/node": "18.11.7",
