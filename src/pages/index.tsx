@@ -1,54 +1,85 @@
+import axios from 'axios'
+import { GetServerSideProps } from 'next'
 import Head from 'next/head'
-import { FormEventHandler, useEffect, useState } from 'react'
+import { FormEventHandler, useState } from 'react'
+import prisma, { Prisma } from '../services/prisma'
+import { formatList } from '../utils/intl'
+import { Unpacked } from '../utils/types'
 
-interface Tag {
-  id: number
-  name: string
+const getApprovedLinks = () =>
+  prisma.link.findMany({
+    include: { tags: true },
+    where: { approved: true },
+    orderBy: { id: 'desc' },
+  })
+
+type ApprovedLinks = Prisma.PromiseReturnType<typeof getApprovedLinks>
+type ApprovedLink = Unpacked<ApprovedLinks>
+type Tag = Unpacked<ApprovedLink['tags']>
+
+// Why serialize? Because this error:
+// SerializableError: Error serializing `.approvedLinks[0].createdAt` returned from `getServerSideProps` in "/".
+
+type SerializedTag = Omit<Tag, 'createdAt' | 'updatedAt'> & {
+  createdAt: string
+  updatedAt: string
 }
 
-interface Link {
-  id: number
-  title: string
-  url: string
-  approved: boolean
-  tags: Tag[]
+type SerializedApprovedLink = Omit<
+  ApprovedLink,
+  'createdAt' | 'updatedAt' | 'tags'
+> & {
+  createdAt: string
+  updatedAt: string
+  tags: SerializedTag[]
 }
 
-const getApprovedLinks = async (): Promise<Link[]> => [
-  {
-    id: 1,
-    title: 'Rant: Projetos, TESTES e Estimativa??? | Rated-R - YouTube',
-    url: 'https://www.youtube.com/watch?v=H_-7o_pLn1s',
-    approved: true,
-    tags: [
-      { id: 1, name: 'Video' },
-      { id: 2, name: 'YouTube' },
-    ],
-  },
-  {
-    id: 2,
-    title: 'Design Patterns na prática. Tudo que você precisa saber',
-    url: 'https://www.youtube.com/watch?v=kE8H6-z6x_8',
-    approved: true,
-    tags: [{ id: 1, name: 'Video' }],
-  },
-]
+interface IndexProps {
+  links: SerializedApprovedLink[]
+}
 
-const formatList = (values: string[]) =>
-  new Intl.ListFormat('pt-BR').format(values)
+export const getServerSideProps: GetServerSideProps<IndexProps> = async () => {
+  const approvedLinks = await getApprovedLinks()
 
-export default function Index() {
+  const serializedApprovedLinks: SerializedApprovedLink[] =
+    approvedLinks.map<SerializedApprovedLink>((link) => ({
+      ...link,
+      createdAt: link.createdAt.toISOString(),
+      updatedAt: link.createdAt.toISOString(),
+      tags: link.tags.map<SerializedTag>((tag) => ({
+        ...tag,
+        createdAt: tag.createdAt.toISOString(),
+        updatedAt: tag.createdAt.toISOString(),
+      })),
+    }))
+
+  return { props: { links: serializedApprovedLinks } }
+}
+
+export default function Index({ links }: IndexProps) {
   const [url, setUrl] = useState('')
-  const [approvedLinks, setApprovedLinks] = useState<Link[]>([])
+  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    getApprovedLinks()
-      .then((value) => setApprovedLinks(value))
-      .catch((reason) => window.alert(String(reason)))
-  }, [])
-
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
+    setLoading(true)
+
+    try {
+      await axios.post('/api/createLink', { url })
+
+      window.alert(
+        'Pronto! Seu link foi enviado, agora passará pelo filtro da administração e se for relacionado a tecnologia será aprovado!'
+      )
+    } catch (reason) {
+      window.alert(
+        axios.isAxiosError(reason) && reason.response?.data.message
+          ? reason.response.data.message
+          : String(reason)
+      )
+    } finally {
+      setUrl('')
+      setLoading(false)
+    }
   }
 
   return (
@@ -56,38 +87,65 @@ export default function Index() {
       <Head>
         <title>Tech Links</title>
       </Head>
-      <h1>Tech Links</h1>
-      <h2>Envie seu link!</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="url">URL</label>
-        <input
-          type="url"
-          id="url"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          maxLength={255}
-          required
-        />
-        <button type="submit">Search</button>
-      </form>
-      <h2>Links enviados</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>URL</th>
-            <th>Tags</th>
-            <th>Tags</th>
-          </tr>
-        </thead>
-        <tbody>
-          {approvedLinks.map((approvedLink) => (
-            <tr key={approvedLink.id}>
-              <td>{approvedLink.title}</td>
-              <td>{formatList(approvedLink.tags.map((tag) => tag.name))}</td>
+
+      <div className="container">
+        <h1 className="mt-5">Tech Links</h1>
+        <p className="mb-5">Links de coisas relacionadas a tecnologia</p>
+
+        <h2 className="mb-3">Envie seu link!</h2>
+
+        <form onSubmit={handleSubmit} className="input-group mb-5">
+          <label htmlFor="url" className="input-group-text">
+            URL
+          </label>
+          <input
+            type="url"
+            id="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            maxLength={255}
+            disabled={loading}
+            className="form-control"
+            required
+          />
+          <button type="submit" disabled={loading} className="btn btn-primary">
+            Enviar
+          </button>
+        </form>
+
+        <h2 className="mb-3">Últimos links aprovados</h2>
+
+        <table className="table">
+          <thead>
+            <tr>
+              <th>URL</th>
+              <th>Tags</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {links.map((link) => (
+              <tr key={link.id}>
+                <td>
+                  <a href={link.url} target="_blank" rel="noreferrer">
+                    {link.title}
+                  </a>
+                </td>
+                <td>{formatList(link.tags.map((tag) => tag.name))}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="position-absolute bottom-0 end-0 p-3">
+        <a
+          href="https://github.com/inolopesm/tech-links"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Projeto no GitHub
+        </a>
+      </div>
     </>
   )
 }
