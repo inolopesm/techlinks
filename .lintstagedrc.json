@@ -1,5 +1,6 @@
 {
   "*.{ts,tsx}": [
-    "npm run lint -- --fix --file"
+    "npm run lint -- --fix --file",
+    "npx prettier --write"
   ]
 }
