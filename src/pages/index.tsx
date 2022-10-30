@@ -119,7 +119,7 @@ export default function Index({ links }: IndexProps) {
 
         <h2 className="mb-3">Últimos links aprovados</h2>
 
-        <table className="table">
+        <table className="table mb-5">
           <thead>
             <tr>
               <th>URL</th>
@@ -139,16 +139,16 @@ export default function Index({ links }: IndexProps) {
             ))}
           </tbody>
         </table>
-      </div>
 
-      <div className="position-absolute bottom-0 end-0 p-3">
-        <a
-          href="https://github.com/inolopesm/tech-links"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Projeto no GitHub
-        </a>
+        <div className="pb-3">
+          <a
+            href="https://github.com/inolopesm/tech-links"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Projeto no GitHub
+          </a>
+        </div>
       </div>
     </>
   )
