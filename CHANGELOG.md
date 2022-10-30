@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/inolopesm/techlinks/compare/v1.2.0...v1.3.0) (2022-10-30)
+
+
+### Features
+
+* add meta description ([55c83e8](https://github.com/inolopesm/techlinks/commit/55c83e8b81e105c36f8d774865c0c51d0fb9ed52))
+* create robots.txt ([6407ffa](https://github.com/inolopesm/techlinks/commit/6407ffa8b2c40a3f9fd671debfc3f4905876e46d))
+* create sitemap.txt ([f432372](https://github.com/inolopesm/techlinks/commit/f4323726ecf6e4b5841e07f2b1e71c22f269e51b))
+
 ## [1.2.0](https://github.com/inolopesm/tech-links/compare/v1.1.0...v1.2.0) (2022-10-27)
 
 
