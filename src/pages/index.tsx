@@ -86,6 +86,10 @@ export default function Index({ links }: IndexProps) {
     <>
       <Head>
         <title>Tech Links</title>
+        <meta
+          name="description"
+          content="Indexador de links relacionados a tecnologia"
+        />
       </Head>
 
       <div className="container">
